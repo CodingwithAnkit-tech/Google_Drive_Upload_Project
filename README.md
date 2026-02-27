@@ -46,6 +46,7 @@ Users authenticate with Google and upload files to a specific Google Drive folde
 
 ## 📂 Project Structure
 
+```text
 Google_Drive_Upload_Project/
 │
 ├── app.py
@@ -53,9 +54,7 @@ Google_Drive_Upload_Project/
 ├── README.md
 ├── .gitignore
 └── templates/
-└── index.html
-
-
+    └── index.html
 ---
 
 ## ⚙️ Setup Instructions (Local Development)
@@ -168,6 +167,7 @@ B.Tech CSE | Python Data Analyst | Python Developer
 ⭐ If You Like This Project
 
 -  Give it a star ⭐ on GitHub!
+
 
 
 
