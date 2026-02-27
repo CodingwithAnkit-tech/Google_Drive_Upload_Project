@@ -1,3 +1,4 @@
+import json
 from flask import Flask, request, jsonify, redirect, render_template
 from flask import Flask, request, jsonify, redirect
 from flask_cors import CORS
@@ -29,12 +30,19 @@ app.secret_key = "supersecretkey"
 # =========================
 @app.route("/auth")
 def auth():
-    flow = Flow.from_client_secrets_file(
-        "credentials.json",
-        scopes=SCOPES,
-        #redirect_uri="http://localhost:5000/oauth2callback"
-        redirect_uri=request.host_url + "oauth2callback"
-    )
+    if os.environ.get("GOOGLE_CREDENTIALS"):
+        creds_json = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+        flow = Flow.from_client_config(
+            creds_json,
+            scopes=SCOPES,
+            redirect_uri=request.host_url + "oauth2callback"
+        )
+    else:
+        flow = Flow.from_client_secrets_file(
+            "credentials.json",
+            scopes=SCOPES,
+            redirect_uri=request.host_url + "oauth2callback"
+        )
 
     auth_url, _ = flow.authorization_url(prompt="consent")
     return redirect(auth_url)
@@ -45,18 +53,26 @@ def auth():
 # =========================
 @app.route("/oauth2callback")
 def oauth2callback():
-    flow = Flow.from_client_secrets_file(
-        "credentials.json",
-        scopes=SCOPES,
-        redirect_uri="http://localhost:5000/oauth2callback"
-    )
+    if os.environ.get("GOOGLE_CREDENTIALS"):
+        creds_json = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+        flow = Flow.from_client_config(
+            creds_json,
+            scopes=SCOPES,
+            redirect_uri=request.host_url + "oauth2callback"
+        )
+    else:
+        flow = Flow.from_client_secrets_file(
+            "credentials.json",
+            scopes=SCOPES,
+            redirect_uri=request.host_url + "oauth2callback"
+        )
 
     flow.fetch_token(authorization_response=request.url)
 
     with open("token.pickle", "wb") as token:
         pickle.dump(flow.credentials, token)
 
-    return "Authentication successful! You can close this tab."
+    return redirect("/")
 
 
 # =========================
@@ -126,4 +142,5 @@ def home():
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)
