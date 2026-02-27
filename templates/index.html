@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drive Upload App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            margin: 15px 0;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .result {
+            margin-top: 15px;
+            word-break: break-all;
+        }
+
+        .link {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📁 Upload to Google Drive</h2>
+
+    <input type="file" id="fileInput">
+    <br>
+    <button onclick="uploadFile()">Upload</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    async function uploadFile() {
+        const fileInput = document.getElementById("fileInput");
+        const resultDiv = document.getElementById("result");
+
+        if (!fileInput.files.length) {
+            resultDiv.innerHTML = "⚠ Please select a file.";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        resultDiv.innerHTML = "Uploading... ⏳";
+
+        try {
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                resultDiv.innerHTML = `
+                    ✅ Upload Successful! <br>
+                    <a class="link" href="${data.link}" target="_blank">Open File</a>
+                `;
+            } else {
+                resultDiv.innerHTML = "❌ Error: " + data.error;
+            }
+
+        } catch (error) {
+            resultDiv.innerHTML = "❌ Upload failed.";
+        }
+    }
+</script>
+
+</body>
+</html>
